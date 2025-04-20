@@ -1,0 +1,72 @@
+Microservice  
+
+•	Microservices are a way of building software applications by breaking them down into small, independent pieces (called "services"). Each service has its own specific task and communicates with other services to work together.
+•	This is different from a traditional, monolithic application, where everything is built an one big program.
+
+Why Use Microservices?
+•	Scalability: You can scale individual services based on their usage.
+•	Fault Tolerance: If one service fails, the others keep running.
+•	Ease of Maintenance: You can update or fix one service without affecting the others.
+
+How Do Microservices Communicate?
+•	Services talk to each other using APIs (Application Programming Interfaces). Most commonly, they use REST APIs over HTTP, where one service sends a request to another and gets a response.
+Example Scenario
+•	Imagine you're building an e-commerce platform:
+1. User Service: Manages users (registration, login).
+2. Order Service: Handles orders (placing, tracking).
+3. Notification Service: Sends emails or SMS notifications.
+When a user places an order (Order Service), the Notification Service gets triggered to send them a confirmation message.
+
+Step-by-Step Guide to Build Microservices in Java Spring Boot
+
+1.	Create 2 microservices: microserviceA and microserviceB (microserviceA calls microserviceB for the data).
+
+2.	Add Web and OpenFeign  dependency
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+
+3.	Add @EnableFeignClients in main Application.java class
+@EnableFeignClients
+
+4.	Create client interface to call second service like below:
+@FeignClient(name = "microserviceB", url = "http://localhost:8081/api")
+public interface BClient {
+    @GetMapping("/message")
+    String getMessage();
+}
+
+5.	In controller class – autowire the client and call serviceB to get message
+@RestController
+@RequestMapping("/api")
+public class AController {
+    
+    @Autowired
+    private BClient bClient;
+
+    @GetMapping("/callSecondService")
+    public String callB() {
+        return bClient.getMessage();
+    }
+}
+
+6.	In microserviceB, add Web and openfeign (only if it calls any other service). Declare endpoints as required.
+@RestController
+@RequestMapping("/api")
+public class BContoller {
+
+    @GetMapping("/message")
+    public String getMessage(){
+        return "Hello! from Microservices B.";
+    }
+}
+
+7.	Run both microservices on different port. (declare the port in application.properties file)
+server.port=8081 (microserviceB)
+server.port=8080 (microserviceA)
+
