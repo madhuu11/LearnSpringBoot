@@ -1,0 +1,50 @@
+DATABASE CONNECTION   
+•	In Java, a database is used to store and manage data efficiently, allowing applications to retrieve, update, and manipulate information as needed.
+•	Here using Spring JPA (Java Persistence API), it is a part of Spring Data that helps developers manage databases efficiently with minimal boilerplate code. It provides an abstraction over JDBC and Hibernate, making database operations simpler.
+•	Simplified CRUD Operations → No need to write SQL queries manually.
+•	Repository Pattern → Provides built-in methods like findById(), save(), and delete().
+
+Step-by-Step Guide to connect database using JPA in Java Spring Boot
+
+1.	Create an application with spring-data-jpa and mysql dependency
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+
+2.	Configure Database in application.properties
+Create Database in mySQL workbench and update in spring.datasource.url
+Update username and password
+#database connection
+spring.datasource.url=jdbc:mysql://localhost:3306/test_db
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+3.	Create an Entity (Model) class : Defines Employee as a database table with fields.
+@Entity
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+}
+
+4.	Create a JPA Repository : This automatically enables CRUD methods (save(), findAll(), deleteById()).
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
