@@ -48,3 +48,85 @@ public class Employee {
 4.	Create a JPA Repository : This automatically enables CRUD methods (save(), findAll(), deleteById()).
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 }
+
+5.	Create service and serviceImpl class for business logic
+public interface EmployeeService {
+    public Employee saveEmployee(Employee employee);
+    public Employee getEmployeeByID(Long id);
+    public List<Employee> getEmployeeList();
+    public void deleteEmployee(Long id);
+}
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService{
+
+//    Marking objects as final in the constructor ensures immutability and promotes good design practices:
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    @Override
+    public Employee saveEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee getEmployeeByID(Long id) {
+        return employeeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Employee> getEmployeeList() {
+        return employeeRepository.findAll();
+    }
+
+    @Override
+    public void deleteEmployee(Long id) {
+        employeeRepository.deleteById(id);
+    }
+}
+
+6.	Create controller class for endpoints
+@RestController
+@RequestMapping("/api")
+public class BContoller {
+
+    private static final Logger log = LoggerFactory.getLogger(BContoller.class);
+    private final EmployeeService employeeService;
+
+    public BContoller(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
+    @PostMapping("/createEmployee")
+    public Employee createEmployee(@RequestBody Employee employee){
+        return employeeService.saveEmployee(employee);
+    }
+
+    @GetMapping("/getEmployee/{id}")
+    public Employee getEmployee(@PathVariable Long id){
+        return employeeService.getEmployeeByID(id);
+    }
+
+    @GetMapping("/getAllEmployee")
+    public List<Employee> getAllEmployee(){
+        return employeeService.getEmployeeList();
+    }
+
+    @DeleteMapping("/deleteEmployee/{id}")
+    public void deleteEmployee(@PathVariable Long id){
+        employeeService.deleteEmployee(id);
+        log.info("Deleted Employee");
+    }
+
+    @GetMapping("/message")
+    public String getMessage(){
+        return "Hello! from Microservices B.";
+    }
+}
+
+7.	Test endpoints using postman and MySQL Workbench
+http://localhost:8081/api/getEmployee/3 - get method call (get employee whose id is 3)
+Verify entity table in 
